@@ -1401,38 +1401,86 @@
             container.innerHTML = html;
         }
 
-        function downloadReport() {
+        async function downloadReport() {
             const loading = document.getElementById('loadingPdf');
             const btn = loading.closest('.btn');
             loading.style.display = 'inline-block';
             btn.disabled = true;
             btn.innerHTML = `<span class="loading" style="display:inline-block"></span> 正在生成高清报告...`;
-            const element = document.getElementById('report-content');
-            setTimeout(() => {
-                html2canvas(element, { scale: 2, useCORS: true, logging: false, scrollY: -window.scrollY, windowWidth: document.documentElement.offsetWidth }).then(canvas => {
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    const imgData = canvas.toDataURL('image/jpeg', 0.98);
-                    const imgWidth = 210;
-                    const pageHeight = 297;
-                    const imgHeight = canvas.height * imgWidth / canvas.width;
-                    let heightLeft = imgHeight;
-                    let position = 0;
-                    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                    while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
-                    }
-                    pdf.save(`天赋报告_${window.reportData.userInfo.nickname}.pdf`);
-                }).finally(() => {
-                    loading.style.display = 'none';
-                    btn.disabled = false;
-                    btn.innerHTML = `<i class="fas fa-download"></i> 下载PDF报告`;
+
+            const source = document.getElementById('report-content');
+            const pdfStyle = document.createElement('style');
+            pdfStyle.textContent = `
+                .pdf-render-root h1 {
+                    background: none !important;
+                    -webkit-background-clip: border-box !important;
+                    background-clip: border-box !important;
+                    -webkit-text-fill-color: #2D3436 !important;
+                    color: #2D3436 !important;
+                }
+            `;
+
+            const clone = source.cloneNode(true);
+            clone.id = 'report-content-pdf';
+            clone.classList.add('pdf-render-root');
+            clone.style.cssText = `
+                position: fixed;
+                left: -10000px;
+                top: 0;
+                width: 794px;
+                padding: 32px;
+                box-sizing: border-box;
+                background: #fff;
+                color: #2D3436;
+            `;
+
+            document.head.appendChild(pdfStyle);
+            document.body.appendChild(clone);
+
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                const canvas = await html2canvas(clone, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    windowWidth: 1000,
+                    scrollY: 0
                 });
-            }, 500);
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgData = canvas.toDataURL('image/jpeg', 0.98);
+                const margin = 10;
+                const pageWidth = 210;
+                const pageHeight = 297;
+                const imgWidth = pageWidth - margin * 2;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                const contentHeight = pageHeight - margin * 2;
+                let heightLeft = imgHeight;
+                let position = margin;
+
+                pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
+                heightLeft -= contentHeight;
+
+                while (heightLeft > 0) {
+                    position = margin - (imgHeight - heightLeft);
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
+                    heightLeft -= contentHeight;
+                }
+
+                pdf.save(`天赋报告_${window.reportData.userInfo.nickname}.pdf`);
+            } catch (error) {
+                console.error('PDF generation failed:', error);
+                alert('PDF生成失败，请稍后重试。');
+            } finally {
+                clone.remove();
+                pdfStyle.remove();
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-download"></i> 下载PDF报告`;
+            }
         }
     </script>
 </body>
