@@ -311,6 +311,44 @@
             .report-navigation { flex-direction: column; }
             .status-options { grid-template-columns: 1fr 1fr; }
             .container { padding: 0 16px; }
+            #step5 {
+                padding: 24px 20px;
+                border-radius: 20px;
+            }
+            #step5 .report-content {
+                padding: 0;
+            }
+            #step5 h1 {
+                font-size: 1.85em !important;
+                line-height: 1.3;
+            }
+            #step5 h2 {
+                font-size: 1.5em;
+                margin-bottom: 18px;
+            }
+            #step5 .section {
+                padding: 18px;
+            }
+            #step5 .quote {
+                padding: 20px 18px;
+            }
+            #step5 .talent-card,
+            #step5 .role-card {
+                padding: 20px 18px;
+                margin-bottom: 20px;
+                border-radius: 16px;
+            }
+            #step5 .keyword-table th,
+            #step5 .keyword-table td {
+                padding: 12px 10px;
+                font-size: 0.95em;
+            }
+            #step5 .report-score-grid,
+            #step5 .talent-columns,
+            #step5 .role-columns {
+                grid-template-columns: 1fr !important;
+                gap: 16px !important;
+            }
         }
     </style>
 </head>
@@ -1341,7 +1379,7 @@
                 </div>
 
                 <h2>第一部分：潜能校准</h2>
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:20px; margin-bottom:30px;">
+                <div class="report-score-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:20px; margin-bottom:30px;">
                     ${part1HTML}
                 </div>
 
@@ -1368,7 +1406,7 @@
                             <strong>💡 关键词：</strong>
                             <ul style="margin-top:10px; padding-left:20px;">${(detail.keywords||[]).map(k => `<li style="margin-bottom:5px;"><strong>${k.keyword}</strong>: ${k.interpretation}</li>`).join('')}</ul>
                         </div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                        <div class="talent-columns" style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                             <div><h4 style="font-size:1em; margin-bottom:10px;">📚 学习建议</h4><ul class="suggestion-list" style="font-size:0.9em;">${(detail.learning||[]).map(l => `<li>${l}</li>`).join('')}</ul></div>
                             <div><h4 style="font-size:1em; margin-bottom:10px;">💼 职业方向</h4><ul class="suggestion-list" style="font-size:0.9em;">${(detail.career||[]).map(c => `<li>${c}</li>`).join('')}</ul></div>
                         </div>
@@ -1383,7 +1421,7 @@
                         <span style="background:var(--primary-light); color:white; padding:4px 12px; border-radius:20px; font-size:0.9em;">${data.roleKey}</span>
                     </div>
                     <p style="font-size:1.1em; line-height:1.8; margin-bottom:30px;">${role.description}</p>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:25px;">
+                    <div class="role-columns" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:25px;">
                         <div><h4 style="color:var(--accent-color); border-bottom:2px solid var(--accent-color); padding-bottom:8px;">✨ 你的超能力</h4><ul class="suggestion-list">${(role.characteristics||[]).map(c => `<li>${c}</li>`).join('')}</ul></div>
                         <div><h4 style="color:#ff7675; border-bottom:2px solid #ff7675; padding-bottom:8px;">⚠️ 潜在盲区</h4><ul class="suggestion-list">${(role.blindSpots||[]).map(b => `<li>${b}</li>`).join('')}</ul></div>
                     </div>
